@@ -11,6 +11,7 @@ var ballY = 490;
 var ballRad = 10;
 var ballSpeedY = 10;
 var ballSpeedX = 5;
+//
 
 var playerX = 350;
 var playerY = 500;
