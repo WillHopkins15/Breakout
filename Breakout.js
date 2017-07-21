@@ -1,5 +1,6 @@
 var canvas;
 var canvasContext;
+var textWidth;
 var gameBegin = false;
 var numColumns = 8;
 var numRows = 6;
@@ -16,6 +17,8 @@ var playerY = 500;
 var paddleWidth = 100;
 var paddleHeight = 10;
 var score = 0;
+var lives = 3;
+var showGameOverScreen = false;
 
 function calculateMousePos(evt){
 	var rect = canvas.getBoundingClientRect();
@@ -26,6 +29,12 @@ function calculateMousePos(evt){
 		x:mouseX,
 		y:mouseY
 	};
+}
+
+function handleMouseClick(evt) {
+	if(showGameOverScreen) { 
+		location.reload();
+	} 
 }
 
 window.onload = function() {
@@ -49,6 +58,8 @@ window.onload = function() {
 		}
 	})
 
+	canvas.addEventListener('mousedown', handleMouseClick)
+
 	canvas.addEventListener('mousemove', function(evt) {
 		var mousePos = calculateMousePos(evt);
 		playerX = mousePos.x - paddleWidth/2;
@@ -58,33 +69,57 @@ window.onload = function() {
 	})
 }
 
+function ballReset() {
+	if(lives <= 0) {
+		showGameOverScreen = true;
+		gameBegin = false;
+	}
+	ballX = playerX + paddleWidth/2;
+	ballY = playerY - ballRad;
+	gameBegin = false;
+}
+
 function drawEverything() {
+
 	drawRect(0, 0, canvas.width, canvas.height, 'Black');
 
-	drawRect(0, 48, canvas.width, 2, 'White');
+	if(showGameOverScreen){
+		canvasContext.fillStyle = 'White';
+		canvasContext.font = '30px Courier';
+		canvasContext.fillText("Game Over!", canvas.width/2 - canvasContext.measureText("Game Over!").width/2, canvas.height/2 + 10)
+		canvasContext.font = '20px Courier';
+		canvasContext.fillText("Click to continue", canvas.width/2 - canvasContext.measureText("Click to continue").width/2, canvas.height/2 + 40)
+	} else {
+		drawRect(0, 48, canvas.width, 2, 'White');
 
-	drawCircle(ballX, ballY, ballRad, 'White');
+		drawCircle(ballX, ballY, ballRad, 'White');
 
-	drawRect(playerX, playerY, paddleWidth, paddleHeight, 'White');
+		drawRect(playerX, playerY, paddleWidth, paddleHeight, 'White');
 
-	canvasContext.font = '30px Courier'
-	canvasContext.fillText("Score: " + score, 100, 35);
-	canvasContext.fillText("Lives: ", 500, 35);
+		canvasContext.font = '30px Courier';
+		canvasContext.fillText("Score: " + score, 100, 35);
+		canvasContext.fillText("Lives: " + lives, 500, 35);
 
-	drawGrid();
+		drawGrid();
+	}
 } 
 
 function moveBall() {
+	if(showGameOverScreen){
+		return;
+	}
+
 	ballY -= ballSpeedY;
 	ballX += ballSpeedX;
 
 	if(ballY - ballRad <= 50){
 		ballSpeedY = -ballSpeedY;
 	} else if(ballY >= canvas.height - ballRad) {
-		ballSpeedY = -ballSpeedY;
-	}
+		lives -= 1;		
+		ballReset();
+	} 
 
-	if(ballX > playerX - ballRad && ballX < playerX + paddleWidth + ballRad && ballY >= playerY) {
+	if(ballX > playerX - ballRad && ballX < playerX + paddleWidth + ballRad && ballY >= playerY && ballY < playerY + 10) {
 		ballSpeedY = -ballSpeedY;
 		var deltaX = ballX - (playerX + paddleWidth/2);
 		ballSpeedX = deltaX * 0.35;
