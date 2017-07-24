@@ -11,7 +11,6 @@ var ballY = 490;
 var ballRad = 10;
 var ballSpeedY = 10;
 var ballSpeedX = 5;
-//
 
 var playerX = 350;
 var playerY = 500;
@@ -20,6 +19,7 @@ var paddleHeight = 10;
 var score = 0;
 var lives = 3;
 var showGameOverScreen = false;
+var showWinScreen = false;
 
 function calculateMousePos(evt){
 	var rect = canvas.getBoundingClientRect();
@@ -34,17 +34,25 @@ function calculateMousePos(evt){
 
 function handleMouseClick(evt) {
 	if(showGameOverScreen) { 
-		location.reload();
+		lives = 3;
+		score = 0;
+		createEmptyGrid();
+		showGameOverScreen = false;
+		gameBegin = false;
 	} 
+}
+
+function createEmptyGrid() {
+	for(var i = 0; i<numColumns*numRows; i++){
+		grid[i] = 1;
+	}
 }
 
 window.onload = function() {
 	canvas = document.getElementById('gameCanvas');
 	canvasContext = canvas.getContext('2d');
 	drawEverything();
-	for(var i = 0; i<numColumns*numRows; i++){
-		grid[i] = 1;
-	}
+	createEmptyGrid();
 
 	setInterval(function() {
 		if(gameBegin){
@@ -77,6 +85,8 @@ function ballReset() {
 	}
 	ballX = playerX + paddleWidth/2;
 	ballY = playerY - ballRad;
+	ballSpeedY = 10;
+	ballSpeedX = 5;
 	gameBegin = false;
 }
 
