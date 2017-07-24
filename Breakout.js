@@ -5,6 +5,7 @@ var gameBegin = false;
 var numColumns = 8;
 var numRows = 6;
 var grid = [];
+var blocksLeft = numRows * numColumns;
 
 var ballX = 400;
 var ballY = 490;
@@ -39,7 +40,11 @@ function handleMouseClick(evt) {
 		createEmptyGrid();
 		showGameOverScreen = false;
 		gameBegin = false;
-	} 
+	} else if(showWinScreen) {
+		createEmptyGrid();
+		showGameOverScreen = false;
+		gameBegin = false;
+	}
 }
 
 function createEmptyGrid() {
@@ -82,6 +87,9 @@ function ballReset() {
 	if(lives <= 0) {
 		showGameOverScreen = true;
 		gameBegin = false;
+	} else if(blocksLeft == 0) {
+		showWinScreen = true
+		gameBegin = false;
 	}
 	ballX = playerX + paddleWidth/2;
 	ballY = playerY - ballRad;
@@ -100,6 +108,12 @@ function drawEverything() {
 		canvasContext.fillText("Game Over!", canvas.width/2 - canvasContext.measureText("Game Over!").width/2, canvas.height/2 + 10)
 		canvasContext.font = '20px Courier';
 		canvasContext.fillText("Click to continue", canvas.width/2 - canvasContext.measureText("Click to continue").width/2, canvas.height/2 + 40)
+	} else if(showWinScreen) {
+		canvasContext.fillStyle = 'White';
+		canvasContext.font = '30px Courier';
+		canvasContext.fillText("You Win!", canvas.width/2 - canvasContext.measureText("You Win!").width/2, canvas.height/2 + 10)
+		canvasContext.font = '20px Courier';
+		canvasContext.fillText("Your score: " + score, canvas.width/2 - canvasContext.measureText("Your score: " + score).width/2, canvas.height/2 + 40)
 	} else {
 		drawRect(0, 48, canvas.width, 2, 'White');
 
@@ -120,13 +134,18 @@ function moveBall() {
 		return;
 	}
 
+	if(blocksLeft == 0 ){
+		ballReset();
+		return;
+	}
+
 	ballY -= ballSpeedY;
 	ballX += ballSpeedX;
 
 	if(ballY - ballRad <= 50){
 		ballSpeedY = -ballSpeedY;
 	} else if(ballY >= canvas.height - ballRad) {
-		lives -= 1;		
+		lives --;		
 		ballReset();
 	} 
 
@@ -151,6 +170,7 @@ function moveBall() {
 			ballSpeedY = -ballSpeedY;
 			grid[i] = 0;
 			score += 5;
+			blocksLeft -= 1;
 			return;
 
 		//top side block collision
@@ -159,6 +179,7 @@ function moveBall() {
 			ballSpeedY = -ballSpeedY;
 			grid[i] = 0;
 			score += 5;
+			blocksLeft -= 1;
 			return;
 
 		//left side block collision
@@ -167,6 +188,7 @@ function moveBall() {
 			ballSpeedX = -ballSpeedX;
 			grid[i] = 0;
 			score += 5;
+			blocksLeft -= 1;
 			return;
 
 		//right side block collision
@@ -175,6 +197,7 @@ function moveBall() {
 			ballSpeedX = -ballSpeedX;
 			grid[i] = 0;
 			score += 5;
+			blocksLeft -= 1;
 			return;
 
 		}
