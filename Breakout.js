@@ -1,6 +1,5 @@
 var canvas;
 var canvasContext;
-var textWidth;
 var gameBegin = false;
 var numColumns = 8;
 var numRows = 6;
@@ -40,10 +39,12 @@ function handleMouseClick(evt) {
 		createEmptyGrid();
 		showGameOverScreen = false;
 		gameBegin = false;
+		blocksLeft = numRows * numColumns;
 	} else if(showWinScreen) {
 		createEmptyGrid();
-		showGameOverScreen = false;
+		showWinScreen = false;
 		gameBegin = false;
+		blocksLeft = numRows * numColumns;
 	}
 }
 
